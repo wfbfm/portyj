@@ -17,7 +17,8 @@ CREATE TABLE positions (
     purchase_notional NUMERIC,
     purchase_notional_gbp NUMERIC,
     trade_date DATE,
-    captured_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    captured_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    account_type account_type NOT NULL
 );
 
 CREATE TABLE prices (

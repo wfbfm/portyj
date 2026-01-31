@@ -30,8 +30,9 @@ public class DbPersistor
                 purchase_fx_rate,
                 purchase_notional,
                 purchase_notional_gbp,
-                trade_date
-            ) VALUES (?, ?, ?::price_source, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                trade_date,
+                account_type
+            ) VALUES (?, ?, ?::price_source, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::account_type)
             """;
 
     // Insert a single position
@@ -53,21 +54,22 @@ public class DbPersistor
     }
 
     // Insert a list of positions efficiently
-    public int[][] insertPositions(final List<CanaccordPosition> positions) {
+    public int[][] insertPositions(final List<Position> positions) {
         return jdbcTemplate.batchUpdate(INSERT_SQL, positions, positions.size(),
-                (PreparedStatement ps, CanaccordPosition position) -> {
+                (PreparedStatement ps, Position position) -> {
                     ps.setString(1, position.getIsin());
                     ps.setString(2, position.getAssetName());
-                    ps.setString(3, "YAHOO"); // source
-                    ps.setString(4, "SYMBOL"); // symbol placeholder
+                    ps.setString(3, position.getSource().name());
+                    ps.setString(4, position.getSymbol());
                     ps.setBigDecimal(5, position.getQuantity());
-                    ps.setBigDecimal(6, position.getPrice());
-                    ps.setString(7, position.getPriceCurrency());
-                    ps.setBigDecimal(8, BigDecimal.ZERO); // purchase_price_gbp
-                    ps.setBigDecimal(9, BigDecimal.ZERO); // purchase_fx_rate
-                    ps.setBigDecimal(10, BigDecimal.ZERO); // purchase_notional
-                    ps.setBigDecimal(11, BigDecimal.ZERO); // purchase_notional_gbp
-                    ps.setDate(12, java.sql.Date.valueOf(position.getAsOf()));
+                    ps.setBigDecimal(6, position.getPurchasePrice());
+                    ps.setString(7, position.getCurrency());
+                    ps.setBigDecimal(8, position.getPurchasePriceGbp());
+                    ps.setBigDecimal(9, position.getPurchaseFxRate());
+                    ps.setBigDecimal(10, position.getPurchaseNotional());
+                    ps.setBigDecimal(11, position.getPurchaseNotionalGbp());
+                    ps.setDate(12, java.sql.Date.valueOf(position.getTradeDate()));
+                    ps.setString(13, position.getAccountType().name());
                 });
     }
 }
