@@ -18,6 +18,7 @@ public class CanaccordPosition
     private String isin;
     private BigDecimal quantity;
     private LocalDate asOf;
+    private BigDecimal fxRate;
 
     public String getAssetName()
     {
@@ -137,5 +138,15 @@ public class CanaccordPosition
     public void setAsOf(final LocalDate asOf)
     {
         this.asOf = asOf;
+    }
+
+    public BigDecimal getFxRate()
+    {
+        return fxRate;
+    }
+
+    public void setFxRate(final BigDecimal fxRate)
+    {
+        this.fxRate = fxRate;
     }
 }

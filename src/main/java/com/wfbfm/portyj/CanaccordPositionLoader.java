@@ -56,6 +56,7 @@ public class CanaccordPositionLoader
                 p.setUnrealisedGain(parseDecimal(record.get("Unrealised gain")));
                 p.setPrice(parseDecimal(record.get("Price")));
                 p.setQuantity(parseDecimal(record.get("Quantity")));
+                p.setFxRate(parseDecimal(record.get("F/X")));
 
                 p.setAsOf(parseDate(record.get("As of")));
 

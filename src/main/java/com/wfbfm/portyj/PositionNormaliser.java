@@ -3,6 +3,7 @@ package com.wfbfm.portyj;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.HashSet;
 import java.util.List;
@@ -81,12 +82,15 @@ public class PositionNormaliser
         position.setSymbol(symbol);
         position.setSource(source);
         position.setQuantity(canaccordPosition.getQuantity());
-        position.setCurrency(canaccordPosition.getPriceCurrency());
-        position.setPurchasePrice(canaccordPosition.getPrice()); // fixme - this isn't quite accurate, it's a bit out of date
-        position.setPurchasePriceGbp(canaccordPosition.getBookCost().divide(canaccordPosition.getQuantity(), RoundingMode.HALF_UP));
-        position.setPurchaseFxRate(position.getPurchasePriceGbp().divide(position.getPurchasePrice(), RoundingMode.HALF_UP));
-        position.setPurchaseNotional(position.getPurchasePrice().multiply(position.getQuantity()));
-        position.setPurchaseNotionalGbp(position.getPurchasePriceGbp().multiply(position.getQuantity()));
+        position.setPurchaseFxRate(canaccordPosition.getFxRate());
+        final BigDecimal purchaseNotionalGbp = canaccordPosition.getBookCost();
+        final BigDecimal purchasePriceGbp = purchaseNotionalGbp.divide(canaccordPosition.getQuantity(), RoundingMode.HALF_UP);
+        final BigDecimal purchaseNotional = purchaseNotionalGbp.divide(canaccordPosition.getFxRate(), RoundingMode.HALF_UP);
+        final BigDecimal purchasePrice = purchasePriceGbp.divide(canaccordPosition.getFxRate(), RoundingMode.HALF_UP);
+        position.setPurchasePrice(purchasePrice);
+        position.setPurchasePriceGbp(purchasePriceGbp);
+        position.setPurchaseNotional(purchaseNotional);
+        position.setPurchaseNotionalGbp(purchaseNotionalGbp);
         position.setTradeDate(canaccordPosition.getAsOf()); // todo - not really
         return position;
     }
