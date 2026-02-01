@@ -83,6 +83,7 @@ public class PositionNormaliser
         position.setSource(source);
         position.setQuantity(canaccordPosition.getQuantity());
         position.setPurchaseFxRate(canaccordPosition.getFxRate());
+        position.setCurrency(canaccordPosition.getCurrency());
         final BigDecimal purchaseNotionalGbp = canaccordPosition.getBookCost();
         final BigDecimal purchasePriceGbp = purchaseNotionalGbp.divide(canaccordPosition.getQuantity(), RoundingMode.HALF_UP);
         final BigDecimal purchaseNotional = purchaseNotionalGbp.divide(canaccordPosition.getFxRate(), RoundingMode.HALF_UP);

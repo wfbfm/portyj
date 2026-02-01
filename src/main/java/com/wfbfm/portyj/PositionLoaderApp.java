@@ -1,26 +1,22 @@
 package com.wfbfm.portyj;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.thymeleaf.expression.Sets;
-
-import java.util.*;
 
 @SpringBootApplication
-public class PortyjApplication implements CommandLineRunner
+public class PositionLoaderApp implements CommandLineRunner
 {
     private final PositionNormaliser normaliser;
 
-    public PortyjApplication(final PositionNormaliser normaliser)
+    public PositionLoaderApp(final PositionNormaliser normaliser)
     {
         this.normaliser = normaliser;
     }
 
     public static void main(String[] args)
     {
-        SpringApplication.run(PortyjApplication.class, args);
+        SpringApplication.run(PositionLoaderApp.class, args);
     }
 
     @Override

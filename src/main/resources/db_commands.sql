@@ -11,7 +11,7 @@ CREATE TABLE positions (
     symbol TEXT,
     quantity NUMERIC,
     purchase_price NUMERIC,
-    purchase_currency TEXT,
+    currency TEXT,
     purchase_price_gbp NUMERIC,
     purchase_fx_rate NUMERIC,
     purchase_notional NUMERIC,

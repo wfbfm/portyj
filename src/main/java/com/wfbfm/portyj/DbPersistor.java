@@ -25,7 +25,7 @@ public class DbPersistor
                 symbol,
                 quantity,
                 purchase_price,
-                purchase_currency,
+                currency,
                 purchase_price_gbp,
                 purchase_fx_rate,
                 purchase_notional,
