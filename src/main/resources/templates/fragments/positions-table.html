@@ -2,6 +2,136 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 
+<div th:fragment="positions-content">
+
+    <div th:replace="~{fragments/positions-table :: summary}"></div>
+    <div th:replace="~{fragments/positions-table :: table}"></div>
+
+</div>
+
+<div th:fragment="summary" class="summary-grid">
+
+    <!-- ALL ACCOUNTS -->
+    <div class="stat-card">
+        <h3>All Accounts</h3>
+
+        <div class="stat-row">
+            <span>Total Value</span>
+            <strong th:text="${#numbers.formatDecimal(summary.totalNotional, 1, 'COMMA', 2, 'POINT')}">0</strong>
+        </div>
+
+        <div class="stat-row">
+            <span>Total P&amp;L</span>
+            <strong th:text="${#numbers.formatDecimal(summary.totalPnl, 1, 'COMMA', 2, 'POINT')}"
+                    th:classappend="${summary.totalPnl.signum() >= 0} ? 'pos' : 'neg'">
+            </strong>
+        </div>
+
+        <div class="stat-row">
+            <span>Total %</span>
+            <strong th:text="${#numbers.formatDecimal(summary.totalPcChange, 1, 'COMMA', 2, 'POINT')} + '%'"
+                    th:classappend="${summary.totalPcChange.signum() >= 0} ? 'pos' : 'neg'">
+            </strong>
+        </div>
+
+        <hr/>
+
+        <div class="stat-row">
+            <span>Today P&amp;L</span>
+            <strong th:text="${#numbers.formatDecimal(summary.dailyPnl, 1, 'COMMA', 2, 'POINT')}"
+                    th:classappend="${summary.dailyPnl.signum() >= 0} ? 'pos' : 'neg'">
+            </strong>
+        </div>
+
+        <div class="stat-row">
+            <span>Today %</span>
+            <strong th:text="${#numbers.formatDecimal(summary.dailyPcChange, 1, 'COMMA', 2, 'POINT')} + '%'"
+                    th:classappend="${summary.dailyPcChange.signum() >= 0} ? 'pos' : 'neg'">
+            </strong>
+        </div>
+    </div>
+
+    <!-- ISA -->
+    <div class="stat-card">
+        <h3>ISA</h3>
+
+        <div class="stat-row">
+            <span>Total Value</span>
+            <strong th:text="${#numbers.formatDecimal(summary.totalIsaNotional, 1, 'COMMA', 2, 'POINT')}"></strong>
+        </div>
+
+        <div class="stat-row">
+            <span>Total P&amp;L</span>
+            <strong th:text="${#numbers.formatDecimal(summary.totalIsaPnl, 1, 'COMMA', 2, 'POINT')}"
+                    th:classappend="${summary.totalIsaPnl.signum() >= 0} ? 'pos' : 'neg'">
+            </strong>
+        </div>
+
+        <div class="stat-row">
+            <span>Total %</span>
+            <strong th:text="${#numbers.formatDecimal(summary.totalIsaPcChange, 1, 'COMMA', 2, 'POINT')} + '%'"
+                    th:classappend="${summary.totalIsaPcChange.signum() >= 0} ? 'pos' : 'neg'">
+            </strong>
+        </div>
+
+        <hr/>
+
+        <div class="stat-row">
+            <span>Today P&amp;L</span>
+            <strong th:text="${#numbers.formatDecimal(summary.dailyIsaPnl, 1, 'COMMA', 2, 'POINT')}"
+                    th:classappend="${summary.dailyIsaPnl.signum() >= 0} ? 'pos' : 'neg'">
+            </strong>
+        </div>
+
+        <div class="stat-row">
+            <span>Today %</span>
+            <strong th:text="${#numbers.formatDecimal(summary.dailyIsaPcChange, 1, 'COMMA', 2, 'POINT')} + '%'"
+                    th:classappend="${summary.dailyIsaPcChange.signum() >= 0} ? 'pos' : 'neg'">
+            </strong>
+        </div>
+    </div>
+
+    <!-- NON-ISA -->
+    <div class="stat-card">
+        <h3>Non-ISA</h3>
+
+        <div class="stat-row">
+            <span>Total Value</span>
+            <strong th:text="${#numbers.formatDecimal(summary.totalNonIsaNotional, 1, 'COMMA', 2, 'POINT')}"></strong>
+        </div>
+
+        <div class="stat-row">
+            <span>Total P&amp;L</span>
+            <strong th:text="${#numbers.formatDecimal(summary.totalNonIsaPnl, 1, 'COMMA', 2, 'POINT')}"
+                    th:classappend="${summary.totalNonIsaPnl.signum() >= 0} ? 'pos' : 'neg'">
+            </strong>
+        </div>
+
+        <div class="stat-row">
+            <span>Total %</span>
+            <strong th:text="${#numbers.formatDecimal(summary.totalNonIsaPcChange, 1, 'COMMA', 2, 'POINT')} + '%'"
+                    th:classappend="${summary.totalNonIsaPcChange.signum() >= 0} ? 'pos' : 'neg'">
+            </strong>
+        </div>
+
+        <hr/>
+
+        <div class="stat-row">
+            <span>Today P&amp;L</span>
+            <strong th:text="${#numbers.formatDecimal(summary.dailyNonIsaPnl, 1, 'COMMA', 2, 'POINT')}"
+                    th:classappend="${summary.dailyNonIsaPnl.signum() >= 0} ? 'pos' : 'neg'">
+            </strong>
+        </div>
+
+        <div class="stat-row">
+            <span>Today %</span>
+            <strong th:text="${#numbers.formatDecimal(summary.dailyNonIsaPcChange, 1, 'COMMA', 2, 'POINT')} + '%'"
+                    th:classappend="${summary.dailyNonIsaPcChange.signum() >= 0} ? 'pos' : 'neg'">
+            </strong>
+        </div>
+    </div>
+
+</div>
 
 <table th:fragment="table">
     <thead>
@@ -20,11 +150,11 @@
         <td th:text="${p.assetName}"></td>
         <td th:text="${p.accountType}"></td>
         <td th:text="${#numbers.formatDecimal(p.quantity, 1, 0)}"></td>
-        <td th:text="${#numbers.formatDecimal(p.purchasePriceGbp, 1, 2)}"></td>
-        <td th:text="${#numbers.formatDecimal(p.currentPriceGbp, 1, 2)}"></td>
-        <td th:text="${#numbers.formatDecimal(p.pnlGbp, 1, 2)}"
+        <td th:text="${#numbers.formatDecimal(p.purchasePriceGbp, 1, 'COMMA', 2, 'POINT')}"></td>
+        <td th:text="${#numbers.formatDecimal(p.currentPriceGbp, 1, 'COMMA', 2, 'POINT')}"></td>
+        <td th:text="${#numbers.formatDecimal(p.pnlGbp, 1, 'COMMA', 2, 'POINT')}"
             th:classappend="${p.pnlGbp.signum() >= 0} ? 'pos' : 'neg'"></td>
-        <td th:text="${#numbers.formatDecimal(p.percentChange, 1, 2)}"></td>
+        <td th:text="${#numbers.formatDecimal(p.percentChange, 1, 'COMMA', 2, 'POINT')}"></td>
     </tr>
     </tbody>
 </table>

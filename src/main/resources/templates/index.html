@@ -12,16 +12,10 @@
 
 
 <div
-        hx-get="/positions/table"
+        hx-get="/positions"
         hx-trigger="load, every 30s"
         hx-swap="innerHTML">
-
-
-    <div th:replace="~{fragments/positions-table :: table}"></div>
-
-
 </div>
-
 
 </body>
 </html>

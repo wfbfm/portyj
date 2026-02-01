@@ -29,7 +29,7 @@ public class PositionsController
     }
 
 
-    @GetMapping("/positions/table")
+    @GetMapping("/positions")
     public String positions(Model model) {
         final List<PositionView> positions = repository.getPositions();
         model.addAttribute("positions", positions);
@@ -37,6 +37,7 @@ public class PositionsController
         final PositionSummaryView summaryView = new PositionSummaryView(positions);
         logger.info("Summary - overall PnL: {} ; daily PnL: {} ; daily change: {}%",
                 summaryView.getTotalPnl(), summaryView.getDailyPnl(), summaryView.getDailyPcChange());
-        return "fragments/positions-table :: table";
+        model.addAttribute("summary", summaryView);
+        return "fragments/positions-table :: positions-content";
     }
 }
