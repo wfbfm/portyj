@@ -1,5 +1,9 @@
-package com.wfbfm.portyj;
+package com.wfbfm.portyj.db;
 
+import com.wfbfm.portyj.model.Position;
+import com.wfbfm.portyj.model.Price;
+import com.wfbfm.portyj.model.Product;
+import com.wfbfm.portyj.model.SymbolSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 

@@ -1,8 +1,10 @@
-package com.wfbfm.portyj;
+package com.wfbfm.portyj.scrape;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wfbfm.portyj.model.Price;
+import com.wfbfm.portyj.model.Product;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 

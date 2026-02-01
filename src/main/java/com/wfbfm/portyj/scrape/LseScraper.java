@@ -1,7 +1,9 @@
-package com.wfbfm.portyj;
+package com.wfbfm.portyj.scrape;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wfbfm.portyj.model.Price;
+import com.wfbfm.portyj.model.Product;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -112,7 +114,7 @@ public class LseScraper
                         if ("pricedata".equals(item.path("name").asText()))
                         {
                             JsonNode v = item.path("value");
-                            final String currency = v.path("currency").asText();
+                            final String currency = "GBp";
                             final Price price = new Price(currency, new BigDecimal(v.path("lastprice").asText()),
                                     new BigDecimal(v.path("lastclose").asText()), fxRates.get(currency));
                             result.put(product, price);

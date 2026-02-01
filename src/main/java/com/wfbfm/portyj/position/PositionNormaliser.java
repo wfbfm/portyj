@@ -1,5 +1,14 @@
-package com.wfbfm.portyj;
+package com.wfbfm.portyj.position;
 
+import com.wfbfm.portyj.db.DbPersistor;
+import com.wfbfm.portyj.scrape.LseScraper;
+import com.wfbfm.portyj.scrape.YahooScraper;
+import com.wfbfm.portyj.model.AccountType;
+import com.wfbfm.portyj.model.CanaccordPosition;
+import com.wfbfm.portyj.model.Position;
+import com.wfbfm.portyj.model.SymbolSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -13,6 +22,7 @@ import java.util.Set;
 @Service
 public class PositionNormaliser
 {
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final CanaccordPositionLoader loader;
     private final DbPersistor dbPersistor;
     private final LseScraper lseScraper;
@@ -55,6 +65,7 @@ public class PositionNormaliser
                 })
                 .toList();
 
+        logger.info("Inserting {} positions", positions.size());
         dbPersistor.insertPositions(positions);
     }
 
@@ -83,11 +94,19 @@ public class PositionNormaliser
         position.setSource(source);
         position.setQuantity(canaccordPosition.getQuantity());
         position.setPurchaseFxRate(canaccordPosition.getFxRate());
-        position.setCurrency(canaccordPosition.getPriceCurrency());
         final BigDecimal purchaseNotionalGbp = canaccordPosition.getBookCost();
         final BigDecimal purchasePriceGbp = purchaseNotionalGbp.divide(canaccordPosition.getQuantity(), RoundingMode.HALF_UP);
-        final BigDecimal purchaseNotional = purchaseNotionalGbp.divide(canaccordPosition.getFxRate(), RoundingMode.HALF_UP);
         final BigDecimal purchasePrice = purchasePriceGbp.divide(canaccordPosition.getFxRate(), RoundingMode.HALF_UP);
+        final BigDecimal purchaseNotional = purchaseNotionalGbp.divide(canaccordPosition.getFxRate(), RoundingMode.HALF_UP);
+        if (source == SymbolSource.LSE)
+        {
+            // LSE pretends prices are in GBP when they are, in fact, GBp
+            position.setCurrency("GBp");
+        }
+        else
+        {
+            position.setCurrency(canaccordPosition.getPriceCurrency());
+        }
         position.setPurchasePrice(purchasePrice);
         position.setPurchasePriceGbp(purchasePriceGbp);
         position.setPurchaseNotional(purchaseNotional);

@@ -1,4 +1,4 @@
-package com.wfbfm.portyj;
+package com.wfbfm.portyj.model;
 
 public enum AccountType
 {

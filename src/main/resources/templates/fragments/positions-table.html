@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+
+<table th:fragment="table">
+    <thead>
+    <tr>
+        <th>Asset</th>
+        <th>Account</th>
+        <th>Qty</th>
+        <th>Cost (GBP)</th>
+        <th>Price (GBP)</th>
+        <th>P&L (GBP)</th>
+        <th>%</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="p : ${positions}">
+        <td th:text="${p.assetName}"></td>
+        <td th:text="${p.accountType}"></td>
+        <td th:text="${p.quantity}"></td>
+        <td th:text="${p.purchasePriceGbp}"></td>
+        <td th:text="${p.currentPriceGbp}"></td>
+        <td th:text="${p.pnlGbp}"
+            th:classappend="${p.pnlGbp.signum() >= 0} ? 'pos' : 'neg'"></td>
+        <td th:text="${p.percentChange}"></td>
+    </tr>
+    </tbody>
+</table>
+
+
+</body>
+</html>

@@ -1,10 +1,9 @@
-package com.wfbfm.portyj;
+package com.wfbfm.portyj.position;
 
+import com.wfbfm.portyj.model.CanaccordPosition;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
