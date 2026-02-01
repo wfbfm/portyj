@@ -1,0 +1,6 @@
+body { font-family: system-ui; margin: 2rem; }
+table { border-collapse: collapse; width: 100%; }
+th, td { padding: 0.6rem; border-bottom: 1px solid #ddd; text-align: right; }
+th:first-child, td:first-child { text-align: left; }
+.pos { color: #0a7a0a; }
+.neg { color: #b00020; }

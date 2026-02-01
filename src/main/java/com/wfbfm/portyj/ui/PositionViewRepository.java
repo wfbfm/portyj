@@ -27,6 +27,7 @@ public class PositionViewRepository
                 p.quantity,
                 p.purchase_price_gbp,
                 pr.current_price_gbp,
+                pr.last_close_gbp,
                 pr.percent_change,
                 (pr.current_price_gbp - p.purchase_price_gbp) * p.quantity AS pnl_gbp
                 FROM positions p
@@ -49,6 +50,7 @@ public class PositionViewRepository
                         rs.getBigDecimal("quantity"),
                         rs.getBigDecimal("purchase_price_gbp"),
                         rs.getBigDecimal("current_price_gbp"),
+                        rs.getBigDecimal("last_close_gbp"),
                         rs.getBigDecimal("pnl_gbp"),
                         rs.getBigDecimal("percent_change")
                 )

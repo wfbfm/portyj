@@ -10,12 +10,15 @@ public class PositionView
     private final BigDecimal quantity;
     private final BigDecimal purchasePriceGbp;
     private final BigDecimal currentPriceGbp;
+    private final BigDecimal lastCloseGbp;
     private final BigDecimal pnlGbp;
     private final BigDecimal percentChange;
 
     public PositionView(final String isin, final String assetName, final String accountType, final BigDecimal quantity,
                         final BigDecimal purchasePriceGbp,
-                        final BigDecimal currentPriceGbp, final BigDecimal pnlGbp, final BigDecimal percentChange)
+                        final BigDecimal currentPriceGbp,
+                        final BigDecimal lastCloseGbp,
+                        final BigDecimal pnlGbp, final BigDecimal percentChange)
     {
         this.isin = isin;
         this.assetName = assetName;
@@ -23,6 +26,7 @@ public class PositionView
         this.quantity = quantity;
         this.purchasePriceGbp = purchasePriceGbp;
         this.currentPriceGbp = currentPriceGbp;
+        this.lastCloseGbp = lastCloseGbp;
         this.pnlGbp = pnlGbp;
         this.percentChange = percentChange;
     }
@@ -65,6 +69,11 @@ public class PositionView
     public BigDecimal getPercentChange()
     {
         return percentChange;
+    }
+
+    public BigDecimal getLastCloseGbp()
+    {
+        return lastCloseGbp;
     }
 }
 

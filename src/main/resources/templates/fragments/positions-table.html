@@ -19,12 +19,12 @@
     <tr th:each="p : ${positions}">
         <td th:text="${p.assetName}"></td>
         <td th:text="${p.accountType}"></td>
-        <td th:text="${p.quantity}"></td>
-        <td th:text="${p.purchasePriceGbp}"></td>
-        <td th:text="${p.currentPriceGbp}"></td>
-        <td th:text="${p.pnlGbp}"
+        <td th:text="${#numbers.formatDecimal(p.quantity, 1, 0)}"></td>
+        <td th:text="${#numbers.formatDecimal(p.purchasePriceGbp, 1, 2)}"></td>
+        <td th:text="${#numbers.formatDecimal(p.currentPriceGbp, 1, 2)}"></td>
+        <td th:text="${#numbers.formatDecimal(p.pnlGbp, 1, 2)}"
             th:classappend="${p.pnlGbp.signum() >= 0} ? 'pos' : 'neg'"></td>
-        <td th:text="${p.percentChange}"></td>
+        <td th:text="${#numbers.formatDecimal(p.percentChange, 1, 2)}"></td>
     </tr>
     </tbody>
 </table>
