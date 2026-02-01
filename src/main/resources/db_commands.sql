@@ -24,11 +24,14 @@ CREATE TABLE positions (
 CREATE TABLE prices (
     id BIGSERIAL PRIMARY KEY,
     isin TEXT NOT NULL,
+    source price_source NOT NULL,
+    symbol TEXT,
     current_price NUMERIC,
-    previous_close NUMERIC,
+    last_close NUMERIC,
     currency TEXT,
     current_price_gbp NUMERIC,
-    previous_close_gbp NUMERIC,
+    last_close_gbp NUMERIC,
     fx_rate NUMERIC,
+    percent_change NUMERIC,
     captured_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );

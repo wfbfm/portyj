@@ -69,17 +69,17 @@ public class LseScraper
 
     // ---------------- Prices ----------------
 
-    public Map<String, MonetaryAmount> getPrices(Set<String> tidms)
+    public Map<Product, Price> getPrices(final Set<Product> products, final Map<String, BigDecimal> fxRates)
     {
-        Map<String, MonetaryAmount> result = new HashMap<>();
+        Map<Product, Price> result = new HashMap<>();
 
-        for (String tidm : tidms)
+        for (Product product : products)
         {
             try
             {
                 Map<String, Object> payload = Map.of(
                         "path", "issuer-profile",
-                        "parameters", "tidm%3D" + tidm +
+                        "parameters", "tidm%3D" + product.getSymbol() +
                                 "%26tab%3Dcompany-page" +
                                 "%26issuername%3Dunited-kingdom" +
                                 "%26tabId%3D771b9c49-382e-4e74-bd94-e96af5c94285",
@@ -112,13 +112,10 @@ public class LseScraper
                         if ("pricedata".equals(item.path("name").asText()))
                         {
                             JsonNode v = item.path("value");
-                            result.put(
-                                    tidm,
-                                    new MonetaryAmount(
-                                            new BigDecimal(v.path("lastprice").asText()),
-                                            v.path("currency").asText()
-                                    )
-                            );
+                            final String currency = v.path("currency").asText();
+                            final Price price = new Price(currency, new BigDecimal(v.path("lastprice").asText()),
+                                    new BigDecimal(v.path("lastclose").asText()), fxRates.get(currency));
+                            result.put(product, price);
                         }
                     }
                 }

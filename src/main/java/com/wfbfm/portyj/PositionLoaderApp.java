@@ -22,6 +22,7 @@ public class PositionLoaderApp implements CommandLineRunner
     @Override
     public void run(final String... args) throws Exception
     {
-        this.normaliser.initialisePositions("positions.csv");
+        System.out.println("Position loader is running");
+//        this.normaliser.initialisePositions("positions.csv");
     }
 }

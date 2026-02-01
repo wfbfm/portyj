@@ -11,51 +11,47 @@ import java.util.Map;
 import java.util.Set;
 
 @Service
-public class PositionNormaliser
+public class PriceLoader
 {
-    private final CanaccordPositionLoader loader;
+
     private final DbPersistor dbPersistor;
     private final LseScraper lseScraper;
     private final YahooScraper yahooScraper;
 
-    public PositionNormaliser(final CanaccordPositionLoader loader, final DbPersistor dbPersistor, final LseScraper lseScraper,
-                              final YahooScraper yahooScraper)
+    public PriceLoader(final DbPersistor dbPersistor, final LseScraper lseScraper,
+                       final YahooScraper yahooScraper)
     {
-        this.loader = loader;
         this.dbPersistor = dbPersistor;
         this.lseScraper = lseScraper;
         this.yahooScraper = yahooScraper;
     }
 
-    public void initialisePositions(final String fileName) throws IOException
+    public void fetchPrices()
     {
-        final List<CanaccordPosition> canaccordPositionList = loader.parse(fileName);
-        final Set<String> lseIsins = new HashSet<>();
-        final Set<String> yahooIsins = new HashSet<>();
-
-        canaccordPositionList.forEach(pos ->
+        final Set<Product> allProducts = dbPersistor.getUniqueProducts();
+        final Set<String> currencies = new HashSet<>();
+        final Set<Product> lseProducts = new HashSet<>();
+        final Set<Product> yahooProducts = new HashSet<>();
+        for (final Product product : allProducts)
         {
-            if (pos.getAssetName().toLowerCase().contains("uk treasury"))
-            {
-                lseIsins.add(pos.getIsin());
+            switch (product.getSource()) {
+                case LSE:
+                    lseProducts.add(product);
+                    break;
+                case YAHOO:
+                    yahooProducts.add(product);
+                    break;
             }
-            else
-            {
-                yahooIsins.add(pos.getIsin());
-            }
-        });
+            currencies.add(product.getCurrency());
+        }
 
-        final Map<String, String> lseSymbols = lseScraper.getSymbols(lseIsins);
-        final Map<String, String> yahooSymbols = yahooScraper.getSymbols(yahooIsins);
-
-        final List<Position> positions = canaccordPositionList.stream()
-                .map(pos ->
-                {
-                    return normalise(pos, lseSymbols, yahooSymbols);
-                })
-                .toList();
-
-        dbPersistor.insertPositions(positions);
+        final Map<String, BigDecimal> fxRates = yahooScraper.getFxRates(currencies);
+        final Map<Product, Price> lsePrices = lseScraper.getPrices(lseProducts, fxRates);
+        final Map<Product, Price> yahooPrices = yahooScraper.getPrices(yahooProducts, fxRates);
+        System.out.println("Found " + lsePrices.size() + " prices for " + lseProducts.size() + " LSE symbols");
+        System.out.println("Found " + yahooPrices.size() + " prices for " + yahooPrices.size() + " Yahoo symbols");
+        dbPersistor.insertPrices(lsePrices);
+        dbPersistor.insertPrices(yahooPrices);
     }
 
     private Position normalise(final CanaccordPosition canaccordPosition,
@@ -83,7 +79,7 @@ public class PositionNormaliser
         position.setSource(source);
         position.setQuantity(canaccordPosition.getQuantity());
         position.setPurchaseFxRate(canaccordPosition.getFxRate());
-        position.setCurrency(canaccordPosition.getPriceCurrency());
+        position.setCurrency(canaccordPosition.getCurrency());
         final BigDecimal purchaseNotionalGbp = canaccordPosition.getBookCost();
         final BigDecimal purchasePriceGbp = purchaseNotionalGbp.divide(canaccordPosition.getQuantity(), RoundingMode.HALF_UP);
         final BigDecimal purchaseNotional = purchaseNotionalGbp.divide(canaccordPosition.getFxRate(), RoundingMode.HALF_UP);

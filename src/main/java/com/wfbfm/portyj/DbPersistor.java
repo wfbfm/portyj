@@ -3,9 +3,8 @@ package com.wfbfm.portyj;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.sql.PreparedStatement;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class DbPersistor
@@ -17,7 +16,7 @@ public class DbPersistor
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    private static final String INSERT_SQL = """
+    private static final String INSERT_POSITION_SQL = """
             INSERT INTO positions (
                 isin,
                 asset_name,
@@ -35,27 +34,24 @@ public class DbPersistor
             ) VALUES (?, ?, ?::price_source, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::account_type)
             """;
 
-    // Insert a single position
-    public int insertPosition(final CanaccordPosition position) {
-        return jdbcTemplate.update(INSERT_SQL,
-                position.getIsin(),
-                position.getAssetName(),
-                "YAHOO", // hardcoded for now
-                "SYMBOL", // placeholder
-                position.getQuantity(),
-                position.getPrice(),
-                position.getPriceCurrency(),
-                0,  // purchase_price_gbp
-                0,  // purchase_fx_rate
-                0,  // purchase_notional
-                0,  // purchase_notional_gbp
-                position.getAsOf()
-        );
-    }
+    private static final String INSERT_PRICE_SQL = """
+            INSERT INTO prices (
+                isin,
+                source,
+                symbol,
+                current_price,
+                last_close,
+                currency,
+                current_price_gbp,
+                last_close_gbp,
+                fx_rate,
+                percent_change
+            ) VALUES (?, ?::price_source, ?, ?, ?, ?, ?, ?, ?, ?)
+            """;
 
-    // Insert a list of positions efficiently
+
     public int[][] insertPositions(final List<Position> positions) {
-        return jdbcTemplate.batchUpdate(INSERT_SQL, positions, positions.size(),
+        return jdbcTemplate.batchUpdate(INSERT_POSITION_SQL, positions, positions.size(),
                 (PreparedStatement ps, Position position) -> {
                     ps.setString(1, position.getIsin());
                     ps.setString(2, position.getAssetName());
@@ -71,5 +67,49 @@ public class DbPersistor
                     ps.setDate(12, java.sql.Date.valueOf(position.getTradeDate()));
                     ps.setString(13, position.getAccountType().name());
                 });
+    }
+
+    public int[][] insertPrices(final Map<Product, Price> prices) {
+
+        List<Map.Entry<Product, Price>> entries = new ArrayList<>(prices.entrySet());
+
+        return jdbcTemplate.batchUpdate(
+                INSERT_PRICE_SQL,
+                entries,
+                entries.size(),
+                (PreparedStatement ps, Map.Entry<Product, Price> entry) -> {
+
+                    Product product = entry.getKey();
+                    Price price = entry.getValue();
+
+                    ps.setString(1, product.getIsin());
+                    ps.setString(2, product.getSource().name());
+                    ps.setString(3, product.getSymbol());
+                    ps.setBigDecimal(4, price.getPrice());
+                    ps.setBigDecimal(5, price.getLastClose());
+                    ps.setString(6, price.getCurrency());
+                    ps.setBigDecimal(7, price.getPriceGbp());
+                    ps.setBigDecimal(8, price.getLastCloseGbp());
+                    ps.setBigDecimal(9, price.getFxRate());
+                    ps.setBigDecimal(10, price.getPercentChangeSinceClose());
+                }
+        );
+    }
+
+    public Set<Product> getUniqueProducts()
+    {
+        final String sql = """
+                SELECT DISTINCT isin, source, symbol, currency from positions
+                """;
+        return new HashSet<>(
+                jdbcTemplate.query(sql, (rs, rowNum) ->
+                        new Product(
+                                rs.getString("isin"),
+                                SymbolSource.valueOf(rs.getString("source")),
+                                rs.getString("symbol"),
+                                rs.getString("currency")
+                        )
+                )
+        );
     }
 }

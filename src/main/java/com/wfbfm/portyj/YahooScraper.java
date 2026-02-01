@@ -68,15 +68,15 @@ public class YahooScraper
     }
 
 
-    public Map<String, MonetaryAmount> getPrices(final Set<String> symbols)
+    public Map<Product, Price> getPrices(final Set<Product> products, final Map<String, BigDecimal> fxRates)
     {
-        final Map<String, MonetaryAmount> result = new HashMap<>();
+        final Map<Product, Price> result = new HashMap<>();
 
 
-        for (String symbol : symbols)
+        for (Product product : products)
         {
             String json = webClient.get()
-                    .uri("https://query1.finance.yahoo.com/v8/finance/chart/{s}", symbol)
+                    .uri("https://query1.finance.yahoo.com/v8/finance/chart/{s}", product.getSymbol())
                     .retrieve()
                     .bodyToMono(String.class)
                     .block();
@@ -94,10 +94,49 @@ public class YahooScraper
 
 
             JsonNode meta = root.path("chart").path("result").get(0).path("meta");
-            result.put(symbol, new MonetaryAmount(
-                    new BigDecimal(meta.path("regularMarketPrice").asText()),
-                    meta.path("currency").asText()
-            ));
+            final String currency = meta.path("currency").asText();
+            final Price price = new Price(currency, new BigDecimal(meta.path("regularMarketPrice").asText()),
+                    new BigDecimal(meta.path("previousClose").asText()), fxRates.get(currency));
+            result.put(product, price);
+        }
+        return result;
+    }
+
+
+
+    public Map<String, BigDecimal> getFxRates(final Set<String> currencies)
+    {
+        final Map<String, BigDecimal> result = new HashMap<>();
+
+
+        for (String currency : currencies)
+        {
+            if (currency.equals("GBP"))
+            {
+                result.put("GBP", BigDecimal.ONE);
+                result.put("GBp", new BigDecimal("0.01"));
+                continue;
+            }
+            String json = webClient.get()
+                    .uri("https://query1.finance.yahoo.com/v8/finance/chart/{s}", currency + "GBP=X")
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+
+            final JsonNode root;
+            try
+            {
+                root = objectMapper.readTree(json);
+            }
+            catch (JsonProcessingException e)
+            {
+                throw new RuntimeException(e);
+            }
+            if (root == null) continue;
+
+
+            JsonNode meta = root.path("chart").path("result").get(0).path("meta");
+            result.put(currency, new BigDecimal(meta.path("regularMarketPrice").asText()));
         }
         return result;
     }
