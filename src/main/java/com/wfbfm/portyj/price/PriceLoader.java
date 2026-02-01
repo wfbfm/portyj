@@ -32,7 +32,7 @@ public class PriceLoader
         this.yahooScraper = yahooScraper;
     }
 
-    @Scheduled(cron = "0 15 8-22 * * MON-FRI")
+    @Scheduled(cron = "0 */15 8-22 * * MON-FRI")
     public void fetchPrices()
     {
         logger.info("Initiating price refresh");
