@@ -29,7 +29,8 @@ public class PositionViewRepository
                 pr.current_price_gbp,
                 pr.last_close_gbp,
                 pr.percent_change,
-                (pr.current_price_gbp - p.purchase_price_gbp) * p.quantity AS pnl_gbp
+                (pr.current_price_gbp - p.purchase_price_gbp) * p.quantity AS total_pnl_gbp,
+                (pr.current_price_gbp - pr.last_close_gbp) * p.quantity AS daily_pnl_gbp
                 FROM positions p
                 JOIN LATERAL (
                 SELECT *
@@ -38,7 +39,7 @@ public class PositionViewRepository
                 ORDER BY pr.captured_at DESC
                 LIMIT 1
                 ) pr ON true
-                ORDER BY pnl_gbp DESC
+                ORDER BY total_pnl_gbp DESC
                 """;
 
 
@@ -51,7 +52,8 @@ public class PositionViewRepository
                         rs.getBigDecimal("purchase_price_gbp"),
                         rs.getBigDecimal("current_price_gbp"),
                         rs.getBigDecimal("last_close_gbp"),
-                        rs.getBigDecimal("pnl_gbp"),
+                        rs.getBigDecimal("total_pnl_gbp"),
+                        rs.getBigDecimal("daily_pnl_gbp"),
                         rs.getBigDecimal("percent_change")
                 )
         );

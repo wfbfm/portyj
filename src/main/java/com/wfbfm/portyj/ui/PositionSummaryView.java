@@ -62,7 +62,7 @@ public class PositionSummaryView
             totalNotional = totalNotional.add(currentNotional);
             totalPurchaseNotional = totalPurchaseNotional.add(purchaseNotional);
             totalLastCloseNotional = totalLastCloseNotional.add(lastCloseNotional);
-            totalPnl = totalPnl.add(p.getPnlGbp());
+            totalPnl = totalPnl.add(p.getTotalPnlGbp());
             dailyPnl = dailyPnl.add(purchaseNotional.subtract(lastCloseNotional));
 
             if (AccountType.ISA.name().equals(p.getAccountType()))
@@ -70,7 +70,7 @@ public class PositionSummaryView
                 totalIsaNotional = totalIsaNotional.add(currentNotional);
                 totalIsaPurchaseNotional = totalIsaPurchaseNotional.add(purchaseNotional);
                 totalIsaLastCloseNotional = totalIsaLastCloseNotional.add(lastCloseNotional);
-                totalIsaPnl = totalIsaPnl.add(p.getPnlGbp());
+                totalIsaPnl = totalIsaPnl.add(p.getTotalPnlGbp());
                 dailyIsaPnl = dailyIsaPnl.add(purchaseNotional.subtract(lastCloseNotional));
             }
             else
@@ -78,7 +78,7 @@ public class PositionSummaryView
                 totalNonIsaNotional = totalNonIsaNotional.add(currentNotional);
                 totalNonIsaPurchaseNotional = totalNonIsaPurchaseNotional.add(purchaseNotional);
                 totalNonIsaLastCloseNotional = totalNonIsaLastCloseNotional.add(lastCloseNotional);
-                totalNonIsaPnl = totalNonIsaPnl.add(p.getPnlGbp());
+                totalNonIsaPnl = totalNonIsaPnl.add(p.getTotalPnlGbp());
                 dailyNonIsaPnl = dailyNonIsaPnl.add(purchaseNotional.subtract(lastCloseNotional));
             }
         }

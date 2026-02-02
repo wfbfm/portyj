@@ -141,8 +141,9 @@
         <th>Qty</th>
         <th>Cost (GBP)</th>
         <th>Price (GBP)</th>
-        <th>P&L (GBP)</th>
-        <th>%</th>
+        <th>Total P&L (GBP)</th>
+        <th>Daily P&L (GBP)</th>
+        <th>Daily % Move</th>
     </tr>
     </thead>
     <tbody>
@@ -152,9 +153,12 @@
         <td th:text="${#numbers.formatDecimal(p.quantity, 1, 0)}"></td>
         <td th:text="${#numbers.formatDecimal(p.purchasePriceGbp, 1, 'COMMA', 2, 'POINT')}"></td>
         <td th:text="${#numbers.formatDecimal(p.currentPriceGbp, 1, 'COMMA', 2, 'POINT')}"></td>
-        <td th:text="${#numbers.formatDecimal(p.pnlGbp, 1, 'COMMA', 2, 'POINT')}"
-            th:classappend="${p.pnlGbp.signum() >= 0} ? 'pos' : 'neg'"></td>
-        <td th:text="${#numbers.formatDecimal(p.percentChange, 1, 'COMMA', 2, 'POINT')}"></td>
+        <td th:text="${#numbers.formatDecimal(p.totalPnlGbp, 1, 'COMMA', 2, 'POINT')}"
+            th:classappend="${p.totalPnlGbp.signum() >= 0} ? 'pos' : 'neg'"></td>
+        <td th:text="${#numbers.formatDecimal(p.dailyPnlGbp, 1, 'COMMA', 2, 'POINT')}"
+            th:classappend="${p.dailyPnlGbp.signum() >= 0} ? 'pos' : 'neg'"></td>
+        <td th:text="${#numbers.formatDecimal(p.percentChange, 1, 'COMMA', 2, 'POINT')}"
+            th:classappend="${p.percentChange.signum() >= 0} ? 'pos' : 'neg'"></td>
     </tr>
     </tbody>
 </table>
