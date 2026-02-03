@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/porty_db
+    username: porty_user
+    password: porty_pass
+    driver-class-name: org.postgresql.Driver
+  thymeleaf:
+    # For live reload
+    cache: false
+
+  devtools:
+    restart:
+      enabled: true
+    livereload:
+      enabled: true
