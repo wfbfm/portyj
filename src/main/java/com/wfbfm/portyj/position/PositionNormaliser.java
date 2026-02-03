@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.HashSet;
@@ -40,6 +41,17 @@ public class PositionNormaliser
     public void initialisePositions(final String fileName) throws IOException
     {
         final List<CanaccordPosition> canaccordPositionList = loader.parse(fileName);
+        initialisePositions(canaccordPositionList);
+    }
+
+    public void initialisePositions(final InputStream inputStream) throws IOException
+    {
+        final List<CanaccordPosition> canaccordPositionList = loader.parse(inputStream);
+        initialisePositions(canaccordPositionList);
+    }
+
+    private void initialisePositions(final List<CanaccordPosition> canaccordPositionList)
+    {
         final Set<String> lseIsins = new HashSet<>();
         final Set<String> yahooIsins = new HashSet<>();
 

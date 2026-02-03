@@ -27,11 +27,16 @@ public class CanaccordPositionLoader
 
     public List<CanaccordPosition> parse(final String csvFileName) throws IOException
     {
+        try (InputStream is = getClass().getClassLoader().getResourceAsStream(csvFileName))
+        {
+            return parse(is);
+        }
+    }
+
+    public List<CanaccordPosition> parse(final InputStream csvStream) throws IOException
+    {
         try (
-                InputStream is = getClass()
-                        .getClassLoader()
-                        .getResourceAsStream(csvFileName);
-                Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8);
+                Reader reader = new InputStreamReader(csvStream, StandardCharsets.UTF_8);
                 CSVParser parser = CSVFormat.DEFAULT
                         .withFirstRecordAsHeader()
                         .withTrim()
