@@ -110,13 +110,13 @@ public class YahooScraper
     {
         final Map<String, BigDecimal> result = new HashMap<>();
 
+        result.put("GBP", BigDecimal.ONE);
+        result.put("GBp", new BigDecimal("0.01"));
 
         for (String currency : currencies)
         {
-            if (currency.equals("GBP"))
+            if (currency.equals("GBP") || currency.equals("GBp"))
             {
-                result.put("GBP", BigDecimal.ONE);
-                result.put("GBp", new BigDecimal("0.01"));
                 continue;
             }
             String json = webClient.get()
