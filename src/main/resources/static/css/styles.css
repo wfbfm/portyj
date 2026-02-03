@@ -1,59 +1,120 @@
-body {
-    font-family: system-ui;
-    margin: 2rem;
+:root {
+        --color-primary: hsl(228, 50%, 90%);
+        --color-secondary: hsl(228, 50%, 10%);
+        --color-tertiary: hsl(54, 100%, 70%);
+        --color-tertiary-light: hsl(54, 100%, 80%);
+        --color-accent: hsl(288, 80%, 20%);
+        --color-accent-light: hsl(288, 80%, 80%);
+
+        --space-xs: clamp(0.25rem, 0.5vw, 0.5rem);
+        --space-sm: clamp(0.5rem, 1vw, 0.75rem);
+        --space-md: clamp(0.75rem, 1.5vw, 1.25rem);
+        --space-lg: clamp(1rem, 2vw, 2rem);
+        --space-xl: clamp(1.5rem, 3vw, 3rem);
+
+        --content-max-width: 1200px;
 }
+
+
+html, body {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+
+    font-family: IBM Plex Sans, sans-serif;
+    background-color: var(--color-secondary);
+    color: var(--color-primary);
+    margin: 0;
+
+    padding: var(--space-lg);
+
+    max-width: var(--content-max-width);
+    margin-inline: auto;
+}
+
+.table-container {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    margin-top: var(--space-lg);
+    margin-bottom: var(--space-lg);
+    border-top: var(--color-primary);
+    padding-top: var(--space-md);
+}
+
 table {
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     width: 100%;
+}
+thead {
+    color: var(--color-tertiary);
 }
 th, td {
     padding: 0.6rem;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid var(--color-tertiary);
     text-align: right;
 }
 th:first-child, td:first-child {
     text-align: left;
 }
 
+@media (max-width: 600px) {
+    body {
+        padding: var(--space-md);
+    }
+
+    th, td {
+        padding: 0.45rem;
+    }
+}
+
 .summary-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 1.2rem;
-    margin-bottom: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
 }
 
 .stat-card {
-    background: #ffffff;
-    border: 1px solid #e2e2e2;
-    border-radius: 8px;
-    padding: 1rem 1.2rem;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    background: var(--color-secondary);
+    border: 1px solid var(--color-tertiary);
+    border-radius: 6px;
+    padding: var(--space-sm);
+    box-shadow: 0 2px 6px var(--color-accent);
 }
 
 .stat-card h3 {
-    margin: 0 0 0.75rem 0;
+    margin: 0 0 var(--space-md) 0;
     font-size: 1.1rem;
-    color: #333;
+    text-align: center;
+    color: var(--color-tertiary);
 }
 
 .stat-row {
     display: flex;
     justify-content: space-between;
-    margin: 0.3rem 0;
-    font-size: 0.95rem;
+    align-items: baseline;
+    gap: var(--space-sm);
+    font-size: clamp(0.85rem, 1vw, 0.95rem);
+    margin: 0 var(--space-md) 0 var(--space-md);
 }
 
 .stat-row span {
-    color: #666;
+    color: var(--color-primary);
 }
 
 .stat-row strong {
     font-weight: 600;
+    margin: var(--space-xs);
 }
 
 .stat-card hr {
     border: none;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--color-tertiary);
     margin: 0.6rem 0;
 }
 

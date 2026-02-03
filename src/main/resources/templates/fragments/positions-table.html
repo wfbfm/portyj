@@ -5,7 +5,9 @@
 <div th:fragment="positions-content">
 
     <div th:replace="~{fragments/positions-table :: summary}"></div>
-    <div th:replace="~{fragments/positions-table :: table}"></div>
+    <div class="table-container">
+        <div th:replace="~{fragments/positions-table :: table}"></div>
+    </div>
 
 </div>
 
@@ -19,6 +21,8 @@
             <span>Total Value</span>
             <strong th:text="${#numbers.formatDecimal(summary.totalNotional, 1, 'COMMA', 2, 'POINT')}">0</strong>
         </div>
+
+        <hr/>
 
         <div class="stat-row">
             <span>Total P&amp;L</span>
@@ -60,6 +64,8 @@
             <strong th:text="${#numbers.formatDecimal(summary.totalIsaNotional, 1, 'COMMA', 2, 'POINT')}"></strong>
         </div>
 
+        <hr/>
+
         <div class="stat-row">
             <span>Total P&amp;L</span>
             <strong th:text="${#numbers.formatDecimal(summary.totalIsaPnl, 1, 'COMMA', 2, 'POINT')}"
@@ -100,6 +106,8 @@
             <strong th:text="${#numbers.formatDecimal(summary.totalNonIsaNotional, 1, 'COMMA', 2, 'POINT')}"></strong>
         </div>
 
+        <hr/>
+
         <div class="stat-row">
             <span>Total P&amp;L</span>
             <strong th:text="${#numbers.formatDecimal(summary.totalNonIsaPnl, 1, 'COMMA', 2, 'POINT')}"
@@ -134,6 +142,7 @@
 </div>
 
 <table th:fragment="table">
+
     <thead>
     <tr>
         <th>Asset</th>
