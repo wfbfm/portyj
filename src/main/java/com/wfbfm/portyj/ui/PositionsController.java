@@ -14,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -57,6 +58,15 @@ public class PositionsController
                 summaryView.getTotalPnl(), summaryView.getDailyPnl(), summaryView.getDailyPcChange());
         model.addAttribute("summary", summaryView);
         return "fragments/positions-table :: positions-content";
+    }
+
+    @GetMapping("/api/positions")
+    @ResponseBody
+    public PositionDto positions()
+    {
+        final List<PositionView> positions = repository.getPositions();
+        final PositionSummaryView summaryView = new PositionSummaryView(positions);
+        return new PositionDto(positions, summaryView);
     }
 
     @PostMapping(
