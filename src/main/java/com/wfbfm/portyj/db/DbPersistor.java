@@ -4,6 +4,7 @@ import com.wfbfm.portyj.model.Position;
 import com.wfbfm.portyj.model.Price;
 import com.wfbfm.portyj.model.Product;
 import com.wfbfm.portyj.model.SymbolSource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -15,9 +16,12 @@ public class DbPersistor
 {
 
     private final JdbcTemplate jdbcTemplate;
+    private final boolean isEnabled;
 
-    public DbPersistor(final JdbcTemplate jdbcTemplate) {
+    public DbPersistor(final JdbcTemplate jdbcTemplate,
+                       @Value("${refresh-enabled}") final boolean isRefreshEnabled) {
         this.jdbcTemplate = jdbcTemplate;
+        this.isEnabled = isRefreshEnabled;
     }
 
     private static final String INSERT_POSITION_SQL = """
@@ -55,6 +59,10 @@ public class DbPersistor
 
 
     public int[][] insertPositions(final List<Position> positions) {
+        if (!isEnabled)
+        {
+            return null;
+        }
         return jdbcTemplate.batchUpdate(INSERT_POSITION_SQL, positions, positions.size(),
                 (PreparedStatement ps, Position position) -> {
                     ps.setString(1, position.getIsin());
@@ -74,6 +82,10 @@ public class DbPersistor
     }
 
     public int[][] insertPrices(final Map<Product, Price> prices) {
+        if (!isEnabled)
+        {
+            return null;
+        }
 
         List<Map.Entry<Product, Price>> entries = new ArrayList<>(prices.entrySet());
 
