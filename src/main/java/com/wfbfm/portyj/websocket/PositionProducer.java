@@ -1,5 +1,6 @@
 package com.wfbfm.portyj.websocket;
 
+import com.wfbfm.portyj.positions.Position;
 import com.wfbfm.portyj.ui.PositionView;
 import com.wfbfm.portyj.ui.PositionViewRepository;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -28,6 +29,23 @@ public class PositionProducer
     public void produce()
     {
         final PositionView view = positions.poll();
-        positionsWebSocketHandler.broadcastPosition(view);
+        positionsWebSocketHandler.broadcastPosition(toProto(view));
+    }
+
+    private Position toProto(final PositionView view)
+    {
+        return Position.newBuilder()
+                .setId(view.id())
+                .setIsin(view.isin())
+                .setAssetName(view.assetName())
+                .setAccountType(view.accountType())
+                .setQuantity(view.quantity().toString())
+                .setPurchasePrice(view.purchasePriceGbp().toString())
+                .setCurrentPrice(view.currentPriceGbp().toString())
+                .setLastClose(view.lastCloseGbp().toString())
+                .setTotalPnl(view.totalPnlGbp().toString())
+                .setDailyPnl(view.dailyPnlGbp().toString())
+                .setPercentChange(view.percentChange().toString())
+                .build();
     }
 }

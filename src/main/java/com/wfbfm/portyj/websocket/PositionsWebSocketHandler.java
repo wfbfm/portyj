@@ -1,64 +1,56 @@
 package com.wfbfm.portyj.websocket;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wfbfm.portyj.ui.PositionView;
-import com.wfbfm.portyj.ui.PositionViewRepository;
+import com.wfbfm.portyj.positions.Position;
+import com.wfbfm.portyj.positions.WsMsg;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.CloseStatus;
-import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-import org.springframework.web.socket.handler.TextWebSocketHandler;
+import org.springframework.web.socket.handler.BinaryWebSocketHandler;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-public class PositionsWebSocketHandler extends TextWebSocketHandler
+public class PositionsWebSocketHandler extends BinaryWebSocketHandler
 {
     private final Logger logger = LoggerFactory.getLogger(PositionsWebSocketHandler.class);
     private final Set<WebSocketSession> sessions = ConcurrentHashMap.newKeySet();
-    private final ObjectMapper objectMapper;
-    private final PositionViewRepository repository;
-
-    public PositionsWebSocketHandler(ObjectMapper objectMapper,
-                                     PositionViewRepository repository)
-    {
-        this.objectMapper = objectMapper;
-        this.repository = repository;
-    }
 
     @Override
-    public void afterConnectionEstablished(WebSocketSession session) throws Exception
+    public void afterConnectionEstablished(final WebSocketSession session)
     {
         logger.info("Adding session {}", session);
         sessions.add(session);
     }
 
     @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus status)
+    public void afterConnectionClosed(final WebSocketSession session, final CloseStatus status)
     {
         sessions.remove(session);
     }
 
-    public void broadcastPosition(final PositionView view)
+    public void broadcastPosition(final Position position)
     {
         sessions.forEach(session ->
         {
             try
             {
-                sendPosition(session, view);
+                sendPosition(session, position);
             } catch (Exception ignored)
             {
             }
         });
     }
 
-    private void sendPosition(final WebSocketSession session, final PositionView view) throws Exception
+    private void sendPosition(final WebSocketSession session, final Position position) throws Exception
     {
-        String json = objectMapper.writeValueAsString(view);
-        logger.info("Sending json {}", json);
-        session.sendMessage(new TextMessage(json));
+        final WsMsg msg = WsMsg.newBuilder()
+                .setPosition(position)
+                .build();
+        logger.info("Sending position {} to session {}", position.getId(), session);
+        session.sendMessage(new BinaryMessage(msg.toByteArray()));
     }
 }
