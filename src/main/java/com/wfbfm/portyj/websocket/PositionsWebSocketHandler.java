@@ -1,13 +1,14 @@
 package com.wfbfm.portyj.websocket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.wfbfm.portyj.ui.PositionDto;
-import com.wfbfm.portyj.ui.PositionSummaryView;
+import com.wfbfm.portyj.ui.PositionView;
 import com.wfbfm.portyj.ui.PositionViewRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import org.springframework.web.socket.*;
+import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.util.Set;
@@ -33,8 +34,6 @@ public class PositionsWebSocketHandler extends TextWebSocketHandler
     {
         logger.info("Adding session {}", session);
         sessions.add(session);
-
-        sendPositions(session);
     }
 
     @Override
@@ -43,26 +42,22 @@ public class PositionsWebSocketHandler extends TextWebSocketHandler
         sessions.remove(session);
     }
 
-    public void broadcastPositions()
+    public void broadcastPosition(final PositionView view)
     {
         sessions.forEach(session ->
         {
             try
             {
-                sendPositions(session);
+                sendPosition(session, view);
             } catch (Exception ignored)
             {
             }
         });
     }
 
-    private void sendPositions(WebSocketSession session) throws Exception
+    private void sendPosition(final WebSocketSession session, final PositionView view) throws Exception
     {
-        final var positions = repository.getPositions();
-        final var summary = new PositionSummaryView(positions);
-        final var dto = new PositionDto(positions, summary);
-
-        String json = objectMapper.writeValueAsString(dto);
+        String json = objectMapper.writeValueAsString(view);
         logger.info("Sending json {}", json);
         session.sendMessage(new TextMessage(json));
     }

@@ -55,22 +55,22 @@ public class PositionSummaryView
         for (PositionView p : positions)
         {
 
-            BigDecimal currentNotional = p.getQuantity().multiply(p.getCurrentPriceGbp());
-            BigDecimal purchaseNotional = p.getQuantity().multiply(p.getPurchasePriceGbp());
-            BigDecimal lastCloseNotional = p.getQuantity().multiply(p.getLastCloseGbp());
+            BigDecimal currentNotional = p.quantity().multiply(p.currentPriceGbp());
+            BigDecimal purchaseNotional = p.quantity().multiply(p.purchasePriceGbp());
+            BigDecimal lastCloseNotional = p.quantity().multiply(p.lastCloseGbp());
 
             totalNotional = totalNotional.add(currentNotional);
             totalPurchaseNotional = totalPurchaseNotional.add(purchaseNotional);
             totalLastCloseNotional = totalLastCloseNotional.add(lastCloseNotional);
-            totalPnl = totalPnl.add(p.getTotalPnlGbp());
+            totalPnl = totalPnl.add(p.totalPnlGbp());
             dailyPnl = dailyPnl.add(purchaseNotional.subtract(lastCloseNotional));
 
-            if (AccountType.ISA.name().equals(p.getAccountType()))
+            if (AccountType.ISA.name().equals(p.accountType()))
             {
                 totalIsaNotional = totalIsaNotional.add(currentNotional);
                 totalIsaPurchaseNotional = totalIsaPurchaseNotional.add(purchaseNotional);
                 totalIsaLastCloseNotional = totalIsaLastCloseNotional.add(lastCloseNotional);
-                totalIsaPnl = totalIsaPnl.add(p.getTotalPnlGbp());
+                totalIsaPnl = totalIsaPnl.add(p.totalPnlGbp());
                 dailyIsaPnl = dailyIsaPnl.add(purchaseNotional.subtract(lastCloseNotional));
             }
             else
@@ -78,7 +78,7 @@ public class PositionSummaryView
                 totalNonIsaNotional = totalNonIsaNotional.add(currentNotional);
                 totalNonIsaPurchaseNotional = totalNonIsaPurchaseNotional.add(purchaseNotional);
                 totalNonIsaLastCloseNotional = totalNonIsaLastCloseNotional.add(lastCloseNotional);
-                totalNonIsaPnl = totalNonIsaPnl.add(p.getTotalPnlGbp());
+                totalNonIsaPnl = totalNonIsaPnl.add(p.totalPnlGbp());
                 dailyNonIsaPnl = dailyNonIsaPnl.add(purchaseNotional.subtract(lastCloseNotional));
             }
         }
