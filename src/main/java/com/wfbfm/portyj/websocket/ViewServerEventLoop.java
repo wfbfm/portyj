@@ -6,10 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketSession;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.*;
 
 @Component
@@ -18,14 +15,14 @@ public class ViewServerEventLoop
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final BlockingQueue<ViewServerEvent> queue = new LinkedBlockingQueue<>();
     private final PositionCache cache;
-    private final Map<String, PositionSubscription> subscriptions = new ConcurrentHashMap<>();
+    private final Map<String, PositionSubscription> subscriptions = new HashMap<>();
     private final PositionSender sender;
+    private final ExecutorService eventLoopExecutor = Executors.newSingleThreadExecutor();
 
     public ViewServerEventLoop(final PositionCache cache, final PositionSender sender)
     {
         this.cache = cache;
         this.sender = sender;
-        ExecutorService eventLoopExecutor = Executors.newSingleThreadExecutor();
         eventLoopExecutor.submit(this::runLoop);
     }
 
@@ -51,20 +48,11 @@ public class ViewServerEventLoop
 
     private void handle(final ViewServerEvent event)
     {
-        if (event instanceof SubscribeEvent)
+        switch (event)
         {
-            handleSubscribe((SubscribeEvent) event);
-            return;
-        }
-        if (event instanceof UnsubscribeEvent)
-        {
-            handleUnsubscribe((UnsubscribeEvent) event);
-            return;
-        }
-        if (event instanceof PositionEvent)
-        {
-            handlePositionEvent((PositionEvent) event);
-            return;
+            case SubscribeEvent e -> handleSubscribe(e);
+            case UnsubscribeEvent e -> handleUnsubscribe(e);
+            case PositionEvent e -> handlePositionEvent(e);
         }
     }
 
@@ -83,7 +71,7 @@ public class ViewServerEventLoop
         });
         subscriptions.put(sessionId, sub);
         logger.info("Subscribing session {}", sessionId);
-        startDrainLoop(event.session());
+        startDrainLoop(event.session(), sub);
     }
 
     private void handleUnsubscribe(final UnsubscribeEvent event) {
@@ -109,11 +97,10 @@ public class ViewServerEventLoop
         }
     }
 
-    private void startDrainLoop(final WebSocketSession session)
+    private void startDrainLoop(final WebSocketSession session, final PositionSubscription sub)
     {
         Thread.ofVirtual().name("drain-" + session.getId()).start(() ->
         {
-            PositionSubscription sub = subscriptions.get(session.getId());
             if (sub == null) return;
 
             while (sub.isOpen())
