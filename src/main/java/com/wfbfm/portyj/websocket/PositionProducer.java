@@ -13,15 +13,16 @@ import java.util.Queue;
 public class PositionProducer
 {
 
-    private final PositionsWebSocketHandler positionsWebSocketHandler;
+    private final PositionService positionService;
     private final Queue<PositionView> positions = new LinkedList<>();
 
-    public PositionProducer(PositionViewRepository positionViewRepository, PositionsWebSocketHandler positionsWebSocketHandler)
+    public PositionProducer(final PositionViewRepository positionViewRepository,
+                            final PositionService service)
     {
         positionViewRepository.getAllPositions().forEach(view -> {
             positions.offer(view);
         });
-        this.positionsWebSocketHandler = positionsWebSocketHandler;
+        this.positionService = service;
     }
 
     // with some imagination, this could be a Kafka topic
@@ -29,7 +30,7 @@ public class PositionProducer
     public void produce()
     {
         final PositionView view = positions.poll();
-        positionsWebSocketHandler.broadcastPosition(toProto(view));
+        positionService.onPositionUpdate(toProto(view));
     }
 
     private Position toProto(final PositionView view)

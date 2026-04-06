@@ -5,6 +5,19 @@ package portyj.positions;
 option java_package = "com.wfbfm.portyj.positions";
 option java_multiple_files = true;
 
+message SubscriptionMsg {
+  SubscriptionType subscriptionType = 1;
+  repeated int64 ids = 2;
+  repeated string isins = 3;
+  repeated string accountTypes = 4;
+}
+
+enum SubscriptionType {
+  UNDEFINED = 0;
+  LIVE = 1;
+  SNAPSHOT = 2;
+}
+
 message WsMsg {
   oneof payload {
     Position position = 1;

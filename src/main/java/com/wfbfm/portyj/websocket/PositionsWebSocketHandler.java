@@ -1,12 +1,12 @@
 package com.wfbfm.portyj.websocket;
 
-import com.wfbfm.portyj.positions.Position;
-import com.wfbfm.portyj.positions.WsMsg;
+import com.wfbfm.portyj.positions.SubscriptionMsg;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.WebSocketMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.BinaryWebSocketHandler;
 
@@ -18,6 +18,12 @@ public class PositionsWebSocketHandler extends BinaryWebSocketHandler
 {
     private final Logger logger = LoggerFactory.getLogger(PositionsWebSocketHandler.class);
     private final Set<WebSocketSession> sessions = ConcurrentHashMap.newKeySet();
+    private final PositionService positionService;
+
+    public PositionsWebSocketHandler(PositionService positionService)
+    {
+        this.positionService = positionService;
+    }
 
     @Override
     public void afterConnectionEstablished(final WebSocketSession session)
@@ -32,25 +38,20 @@ public class PositionsWebSocketHandler extends BinaryWebSocketHandler
         sessions.remove(session);
     }
 
-    public void broadcastPosition(final Position position)
+    @Override
+    public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception
     {
-        sessions.forEach(session ->
+        if (!(message instanceof BinaryMessage binaryMessage))
         {
-            try
-            {
-                sendPosition(session, position);
-            } catch (Exception ignored)
-            {
-            }
-        });
+            logger.warn("Received non-binary message from session {}", session.getId());
+            return;
+        }
+
+        final byte[] payload = binaryMessage.getPayload().array();
+        final SubscriptionMsg subscriptionMsg = SubscriptionMsg.parseFrom(payload);
+        final PositionFilter filter = new PositionFilter(subscriptionMsg);
+
+        positionService.handleSubscribeRequest(session, filter);
     }
 
-    private void sendPosition(final WebSocketSession session, final Position position) throws Exception
-    {
-        final WsMsg msg = WsMsg.newBuilder()
-                .setPosition(position)
-                .build();
-        logger.info("Sending position {} to session {}", position.getId(), session);
-        session.sendMessage(new BinaryMessage(msg.toByteArray()));
-    }
 }
