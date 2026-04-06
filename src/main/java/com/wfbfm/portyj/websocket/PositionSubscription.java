@@ -37,6 +37,11 @@ public class PositionSubscription
         return filter;
     }
 
+    public void close()
+    {
+        this.isOpen = false;
+    }
+
     public boolean isOpen()
     {
         return isOpen;

@@ -13,16 +13,16 @@ import java.util.Queue;
 public class PositionProducer
 {
 
-    private final PositionService positionService;
     private final Queue<PositionView> positions = new LinkedList<>();
+    private final ViewServerEventLoop eventLoop;
 
     public PositionProducer(final PositionViewRepository positionViewRepository,
-                            final PositionService service)
+                            final ViewServerEventLoop eventLoop)
     {
         positionViewRepository.getAllPositions().forEach(view -> {
             positions.offer(view);
         });
-        this.positionService = service;
+        this.eventLoop = eventLoop;
     }
 
     // with some imagination, this could be a Kafka topic
@@ -30,7 +30,7 @@ public class PositionProducer
     public void produce()
     {
         final PositionView view = positions.poll();
-        positionService.onPositionUpdate(toProto(view));
+        eventLoop.submit(new PositionEvent(toProto(view)));
     }
 
     private Position toProto(final PositionView view)

@@ -18,11 +18,11 @@ public class PositionsWebSocketHandler extends BinaryWebSocketHandler
 {
     private final Logger logger = LoggerFactory.getLogger(PositionsWebSocketHandler.class);
     private final Set<WebSocketSession> sessions = ConcurrentHashMap.newKeySet();
-    private final PositionService positionService;
+    private final ViewServerEventLoop eventLoop;
 
-    public PositionsWebSocketHandler(PositionService positionService)
+    public PositionsWebSocketHandler(final ViewServerEventLoop eventLoop)
     {
-        this.positionService = positionService;
+        this.eventLoop = eventLoop;
     }
 
     @Override
@@ -36,6 +36,8 @@ public class PositionsWebSocketHandler extends BinaryWebSocketHandler
     public void afterConnectionClosed(final WebSocketSession session, final CloseStatus status)
     {
         sessions.remove(session);
+        eventLoop.submit(new UnsubscribeEvent(session.getId()));
+        logger.info("Submitted unsubscribe event for session {}", session);
     }
 
     @Override
@@ -51,7 +53,7 @@ public class PositionsWebSocketHandler extends BinaryWebSocketHandler
         final SubscriptionMsg subscriptionMsg = SubscriptionMsg.parseFrom(payload);
         final PositionFilter filter = new PositionFilter(subscriptionMsg);
 
-        positionService.handleSubscribeRequest(session, filter);
+        eventLoop.submit(new SubscribeEvent(session, filter));
+        logger.info("Submitted subscribe event for session {}", session);
     }
-
 }
