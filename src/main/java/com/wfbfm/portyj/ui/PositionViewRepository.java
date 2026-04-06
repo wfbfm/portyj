@@ -1,6 +1,5 @@
 package com.wfbfm.portyj.ui;
 
-import com.wfbfm.portyj.model.Position;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -54,8 +53,49 @@ public class PositionViewRepository
                         rs.getBigDecimal("last_close_gbp"),
                         rs.getBigDecimal("total_pnl_gbp"),
                         rs.getBigDecimal("daily_pnl_gbp"),
-                        rs.getBigDecimal("percent_change")
-                )
+                        rs.getBigDecimal("percent_change"),
+                        -1)
+        );
+    }
+
+    public List<PositionView> getAllPositions()
+    {
+
+        String sql = """
+                SELECT
+                p.id,
+                p.isin,
+                p.asset_name,
+                p.account_type,
+                p.quantity,
+                p.purchase_price_gbp,
+                pr.current_price_gbp,
+                pr.last_close_gbp,
+                pr.percent_change,
+                (pr.current_price_gbp - p.purchase_price_gbp) * p.quantity AS total_pnl_gbp,
+                (pr.current_price_gbp - pr.last_close_gbp) * p.quantity AS daily_pnl_gbp
+                FROM positions p
+                JOIN LATERAL (
+                SELECT *
+                FROM prices pr
+                WHERE pr.isin = p.isin
+                ) pr ON true
+                order by pr.captured_at ASC
+                """;
+
+        return jdbcTemplate.query(sql, (rs, rowNum) ->
+                new PositionView(
+                        rs.getString("isin"),
+                        rs.getString("asset_name"),
+                        rs.getString("account_type"),
+                        rs.getBigDecimal("quantity"),
+                        rs.getBigDecimal("purchase_price_gbp"),
+                        rs.getBigDecimal("current_price_gbp"),
+                        rs.getBigDecimal("last_close_gbp"),
+                        rs.getBigDecimal("total_pnl_gbp"),
+                        rs.getBigDecimal("daily_pnl_gbp"),
+                        rs.getBigDecimal("percent_change"),
+                        rs.getLong("id"))
         );
     }
 }
